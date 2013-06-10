@@ -1,0 +1,58 @@
+!!! 5
+html
+  head
+    title !{title}
+    script(type='text/javascript', src='/js/vendor/jquery-1.10.1.min.js')
+    script(type='text/javascript', src='/js/vendor/underscore.js')
+    script(type='text/javascript', src="/socket.io/socket.io.js")
+
+    script(type='text/javascript', src="/js/common/log.js")
+    script(type='text/javascript', src="/js/common/pubsub.js")
+    script(type='text/javascript', src="/js/common/math.js")
+    script(type='text/javascript', src="/js/common/physics.js")
+    script(type='text/javascript', src="/js/common/collide.js")
+    script(type='text/javascript', src="/js/common/render.js")
+    script(type='text/javascript', src="/js/common/entity.js")
+    script(type='text/javascript', src="/js/common/world.js")
+    script(type='text/javascript', src="/js/common/simulation.js")
+    script(type='text/javascript', src="/js/common/game.js")
+
+    script(type='text/javascript', src="/js/client/common.js")
+    script(type='text/javascript', src="/js/client/input.js")
+    script(type='text/javascript', src="/js/client/net.js")
+    script(type='text/javascript', src="/js/client/client.js")
+    script(type='text/javascript', src="/js/client/pageinit.js")
+
+    link(rel='stylesheet', href='/styles/main.css')
+  body
+    header
+      | n &bull; fold
+    .main
+      .main_content
+        section
+          canvas(width='800', height='600')
+        section
+          form#chat
+            input(name='say_what', type='text')
+      .sub_content
+        span.client-id
+        span.score
+        p
+          form#set-name
+            input(name='player_name', type='text', value='player')
+            input(type='submit', value='set name')
+        section.debug
+          ul
+            li
+              input.debug#debug_quadtrees(name='debug_quadtrees', value='quadtrees', type='checkbox')
+              label(for='debug_quadtrees') quadtrees
+            li
+              input.debug#debug_collisions(name='debug_collisions', value='collisions', type='checkbox')
+              label(for='debug_collisions') collisions
+        section.chat_messages
+    footer
+      pre.help
+        | space        - enter game / fire
+        | left/right   - rotate
+        | up           - thrust
+        | t            - chat
