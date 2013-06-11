@@ -78,7 +78,7 @@ GameClient.prototype.renderDebug = function() {
         })
       }
     })
-    render.render_collision_geometry(this.ctx, this.viewport, collide_things)
+    this.renderer.render_collision_geometry(collide_things)
   }
 }
 
