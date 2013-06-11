@@ -1,3 +1,65 @@
+function CanvasRenderer(canvas) {
+  this.ctx = canvas.getContext('2d')
+  this.viewport = collide.AABB(0, 0, canvas.width, canvas.height)
+}
+
+CanvasRenderer.prototype.renderScene = function(game) {
+  var self = this
+  var ctx = this.ctx
+  var sim = game.sim
+
+  ctx.save()
+
+  ctx.fillStyle = nfold.background_color
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+  var view = this.viewport
+  ctx.translate(-view.min_x, -view.min_y)
+
+  // Draw background
+  ctx.beginPath()
+  ctx.strokeStyle = 'rgba(0,0,0,0.2)'
+  ctx.lineWidth = 1
+
+  for (var x = (view.min_x - view.min_x % 50); x < view.max_x; x += 50) {
+    ctx.moveTo(x, view.min_y)
+    ctx.lineTo(x, view.max_y)
+  }
+  for (var y = (view.min_y - view.min_y % 50); y < view.max_y; y += 50) {
+    ctx.moveTo(view.min_x, y)
+    ctx.lineTo(view.max_x, y)
+  }
+  ctx.stroke()
+
+  // draw boundary of the world
+  ctx.strokeStyle = 'gray'
+  var world_bounds = sim.world_bounds()
+  ctx.strokeRect(
+    world_bounds.min_x,
+    world_bounds.min_y,
+    world_bounds.max_x - world_bounds.min_x,
+    world_bounds.max_y - world_bounds.min_y
+  )
+
+  var render_count = 0
+  sim.each_entity(view, function(entity) {
+    self.renderEntity(entity, ctx)
+    render_count += 1
+  })
+  ctx.restore()
+}
+
+CanvasRenderer.prototype.renderEntity = function(entity, ctx) {
+  var renderFn = render[entity.type.toLowerCase()] || render.debug
+  render.prerender(entity, ctx)
+  renderFn(entity, ctx)
+  render.postrender(entity, ctx)
+}
+
+CanvasRenderer.prototype.centerOn = function(entity) {
+  this.viewport.setCenter(entity.position)
+}
+
 function _radial_powerup(n) {
   return function(o, ctx) {
     var offset = ((new Date).getTime()/500) % (2*Math.PI)
@@ -106,57 +168,6 @@ var render = {
     ctx.lineWidth = 2
     _circle(ctx, o.radius, 'green')
     ctx.stroke()
-  },
-
-  renderScene: function(game) {
-
-    var ctx = game.renderOptions.ctx
-    var viewport = game.renderOptions.viewport
-    var sim = game.sim
-
-    ctx.save()
-
-    ctx.fillStyle = nfold.background_color,
-      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-
-    var view = viewport
-    ctx.translate(-view.min_x, -view.min_y)
-
-    // Draw background
-    ctx.beginPath()
-    ctx.strokeStyle = 'rgba(0,0,0,0.2)'
-    ctx.lineWidth = 1
-
-    for (var x = (view.min_x - view.min_x % 50); x < view.max_x; x += 50) {
-      ctx.moveTo(x, view.min_y)
-      ctx.lineTo(x, view.max_y)
-    }
-    for (var y = (view.min_y - view.min_y % 50); y < view.max_y; y += 50) {
-      ctx.moveTo(view.min_x, y)
-      ctx.lineTo(view.max_x, y)
-    }
-    ctx.stroke()
-
-    // draw boundary of the world
-    ctx.strokeStyle = 'gray'
-    var world_bounds = sim.world_bounds()
-    ctx.strokeRect(
-      world_bounds.min_x,
-      world_bounds.min_y,
-      world_bounds.max_x - world_bounds.min_x,
-      world_bounds.max_y - world_bounds.min_y
-    )
-
-
-    var render_count = 0
-    sim.each_entity(view, function(o) {
-      var renderFn = render[o.type.toLowerCase()] || render.debug
-      render.prerender(o, ctx)
-      renderFn(o, ctx)
-      render.postrender(o, ctx)
-      render_count += 1
-    })
-    ctx.restore()
   },
 
   render_collision_geometry: function(ctx, viewport, collision_objects) {

@@ -8,36 +8,35 @@ if (typeof window === 'undefined') {
     var defaults = {
       tickInterval: 20,
       frameTime: 0,
+      sim: null,
+      world: null,
       preRender: function() {},
       postRender: function() {}
     }
     _.extend(this, defaults, opts)
   }
 
-  _.extend(Game.prototype, {
-    mainLoop: function() {
-      var self = this
-      var lastLoopTime = (new Date).getTime()
+  Game.prototype.mainLoop = function() {
+    var self = this
+    var lastLoopTime = (new Date).getTime()
 
-      function loop() {
-        var startTime = (new Date).getTime()
-        self.frameTime = startTime - lastLoopTime
+    function loop() {
+      var startTime = (new Date).getTime()
+      self.frameTime = startTime - lastLoopTime
 
-        self.sim.tick(self)
-        self.preRender(self)
-        if (self.renderer) {
-          self.renderer.renderScene(self)
-        }
-        self.postRender(self)
-
-        var elapsed = (new Date).getTime() - startTime
-        setTimeout(loop, Math.max(self.tickInterval - elapsed, 0))
-        lastLoopTime = startTime
+      self.sim.tick(self)
+      self.preRender(self)
+      if (self.renderer) {
+        self.renderer.renderScene(self)
       }
+      self.postRender(self)
 
-      loop()
+      var elapsed = (new Date).getTime() - startTime
+      setTimeout(loop, Math.max(self.tickInterval - elapsed, 0))
+      lastLoopTime = startTime
     }
-  })
+    loop()
+  }
 
   exports.Game = Game
 

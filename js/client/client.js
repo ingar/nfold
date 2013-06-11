@@ -5,24 +5,20 @@ function GameClient() {
   this.input = new InputManager()
   this.sim = simulation.Simulation({ type: simulation.CLIENT })
   this.player = null
+  this.renderer = new CanvasRenderer(document.querySelector('.main canvas'))
 
-  this.initRender()
   this.initNetwork()
   this.initEvents()
 
   this.game = new game.Game({
     sim: this.sim,
-    renderer: render,
+    renderer: this.renderer,
     preRender: function() {
       self.handleInput()
       self.updateViewport()
     },
     postRender: function() {
       self.renderDebug()
-    },
-    renderOptions: {
-      ctx: this.ctx,
-      viewport: this.viewport
     }
   })
 
@@ -56,6 +52,7 @@ GameClient.prototype.handleInput = function() {
   var player = this.player
   var input = this.input
 
+  player.acceleration = [0, 0]
   if (input.isPressed(37)) { player.rotateLeft(frameTime) }
   if (input.isPressed(39)) { player.rotateRight(frameTime) }
   if (input.isPressed(38)) { player.forwardThrust() }
@@ -65,16 +62,8 @@ GameClient.prototype.handleInput = function() {
 
 GameClient.prototype.updateViewport = function(game) {
   if (this.player) {
-    this.viewport.update_cwh(this.player.position, this.width, this.height)
+    this.renderer.centerOn(this.player)
   }
-}
-
-GameClient.prototype.initRender = function() {
-  var $canvas = $('.main canvas')
-  this.ctx = $canvas[0].getContext('2d')
-  this.width = $canvas.width()
-  this.height = $canvas.height()
-  this.viewport = collide.AABB(0, 0, this.width, this.height)
 }
 
 GameClient.prototype.renderDebug = function() {

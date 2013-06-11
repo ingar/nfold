@@ -79,6 +79,18 @@ collide.AABB = function(x0, y0, x1, y1, opts) {
         c[0] + w*0.5,
         c[1] + h*0.5
       )
+    },
+
+    setCenter: function(c) {
+      this.update_cwh(c, this.width(), this.height())
+    },
+
+    width: function() {
+      return this.max_x - this.min_x
+    },
+
+    height: function() {
+      return this.max_y - this.min_y
     }
 
   }, opts)
