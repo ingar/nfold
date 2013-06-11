@@ -150,9 +150,10 @@ var render = {
 
     var render_count = 0
     sim.each_entity(view, function(o) {
-      o.prerender(o, ctx)
-      o.render(o, ctx)
-      o.postrender(o, ctx)
+      var renderFn = render[o.type.toLowerCase()] || render.debug
+      render.prerender(o, ctx)
+      renderFn(o, ctx)
+      render.postrender(o, ctx)
       render_count += 1
     })
     ctx.restore()

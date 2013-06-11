@@ -1,6 +1,5 @@
 // underscore.js
 // math.js
-// render.js
 // pubsub.js
 // physics.js
 
@@ -9,7 +8,6 @@ if (typeof window === 'undefined') {
   var _ = require('underscore')._
   var physics = require('./physics')
   var pubsub = require('./pubsub')
-  var render = require('./render')
   var collide = require('./collide')
 }
 
@@ -60,14 +58,6 @@ if (typeof window === 'undefined') {
     },
 
     update_physics: physics.standard,
-
-    render: function(o, ctx) {
-      (render[this.type.toLowerCase()] || render.debug)(o, ctx)
-    },
-
-    prerender: render.prerender,
-
-    postrender: render.postrender,
 
     init_collide: function() {
       return collide.AABB_cwh(this.position, this.radius*2, this.radius*2, { flags: exports.PHYSICAL | exports.VISIBLE })

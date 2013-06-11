@@ -7,6 +7,8 @@ var log = require('../common/log')
 var net = require('./net')
 
 exports.startup = function(httpServer) {
+  var POWERUP_SPAWN_FREQUENCY = 1000
+  var MAX_POWERUPS = 100
 
   var simulation = sim.Simulation(null, { type: sim.SERVER })
 
@@ -23,7 +25,7 @@ exports.startup = function(httpServer) {
   var addPowerups = function() {
     var bounds, e, num, powerup_type, powerup_types
     bounds = simulation.world_bounds()
-    num = 10 - countPowerups()
+    num = MAX_POWERUPS - countPowerups()
     powerup_types = ['doublerate', 'doublespread', 'triplespread', 'nonagun', 'awesomeness']
     if (num > 0) {
       powerup_type = powerup_types[Math.floor(Math.random() * powerup_types.length)]
@@ -35,7 +37,7 @@ exports.startup = function(httpServer) {
       num -= 1
       log.debug('Spawned a "' + e.powerup_type + '" powerup')
     }
-    return setTimeout(addPowerups, 10000)
+    return setTimeout(addPowerups, POWERUP_SPAWN_FREQUENCY)
   }
   var game = new Game({
     sim: simulation
