@@ -2,25 +2,31 @@ function GameClient() {
   var self = this
 
   this.clientId = 'client:' + Math.round(Math.random() * 0xFFFFFFFF).toString(16)
-  this.sim = simulation.Simulation(new InputManager(), { type: simulation.CLIENT })
+  this.input = new InputManager()
+  this.sim = simulation.Simulation({ type: simulation.CLIENT })
   this.player = null
 
   this.initRender()
   this.initNetwork()
   this.initEvents()
 
-  var nfoldGame = new game.Game({
+  this.game = new game.Game({
     sim: this.sim,
     renderer: render,
-    preRender: function() { self.updateViewport() },
-    postRender: function() { self.renderDebug() },
+    preRender: function() {
+      self.handleInput()
+      self.updateViewport()
+    },
+    postRender: function() {
+      self.renderDebug()
+    },
     renderOptions: {
       ctx: this.ctx,
       viewport: this.viewport
     }
   })
 
-  nfoldGame.mainLoop()
+  this.game.mainLoop()
 }
 
 GameClient.prototype.initNetwork = function() {
@@ -39,6 +45,22 @@ GameClient.prototype.initEvents = function() {
     self.sim.net.broadcast('chat', data)
     pubsub.publish('chat', data)
   })
+}
+
+GameClient.prototype.handleInput = function() {
+  if (!this.isPlaying()) {
+    return
+  }
+
+  var frameTime = this.game.frameTime * 0.001
+  var player = this.player
+  var input = this.input
+
+  if (input.isPressed(37)) { player.rotateLeft(frameTime) }
+  if (input.isPressed(39)) { player.rotateRight(frameTime) }
+  if (input.isPressed(38)) { player.forwardThrust() }
+  if (input.isPressed(40)) { player.reverseThrust() }
+  if (input.isPressed(32)) { player.fire() }
 }
 
 GameClient.prototype.updateViewport = function(game) {

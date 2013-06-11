@@ -43,7 +43,7 @@ if (typeof window === 'undefined') {
     })
   }
 
-  var Simulation = function(input_manager, opts) {
+  var Simulation = function(opts) {
     var collidees = []
 
     var create_quadtree = function() {
@@ -58,7 +58,6 @@ if (typeof window === 'undefined') {
       collide_type: collide.CLIENT,
       quadtree: create_quadtree(),
       broadcast_entities: [],
-      input: input_manager,
       net: {
         broadcast: function() {},
         send: function() {}

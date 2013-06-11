@@ -7,6 +7,7 @@ if (typeof window === 'undefined') {
   function Game(opts) {
     var defaults = {
       tickInterval: 20,
+      frameTime: 0,
       preRender: function() {},
       postRender: function() {}
     }

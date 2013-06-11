@@ -219,7 +219,7 @@ if (typeof window === 'undefined') {
 
     _init: function(opts) {
       exports.Entity._init.call(this, opts)
-      this.last_fire = 0
+      this.lastFireTime = 0
       this.health = 100
       this.max_health = 100
       this.powerup_flags = 0x0
@@ -227,26 +227,33 @@ if (typeof window === 'undefined') {
       this.projectile = 'Projectile'
     },
 
-    handle_input: function(input, dt) {
-      if (input.isPressed(37)) { this.rotate(-this.rotate_speed * dt) }
-      if (input.isPressed(39)) { this.rotate( this.rotate_speed * dt) }
+    rotateLeft: function(scale) {
+      this.rotate(-this.rotate_speed * scale)
+    },
 
-      this.acceleration = [0, 0]
-      if (input.isPressed(38)) { this.acceleration = mat2.transform(mat2.rotate(this.rotation), [0, this.thrust]) }
-      if (input.isPressed(40)) { this.acceleration = mat2.transform(mat2.rotate(this.rotation + Math.PI), [0, this.reverse_thrust]) }
+    rotateRight: function(scale) {
+      this.rotate(this.rotate_speed * scale)
+    },
 
-      if (input.isPressed(32)) {
-        var rate = (this.powerup_flags & PU_DOUBLERATE) ? autofire_rate * 0.5 : autofire_rate
-        t = (new Date).getTime()
-        if (t - this.last_fire > rate) {
-          this.fire()
-          this.last_fire = t
-        }
+    forwardThrust: function() {
+      this.acceleration = mat2.transform(mat2.rotate(this.rotation), [0, this.thrust])
+    },
+
+    reverseThrust: function() {
+      this.acceleration = mat2.transform(mat2.rotate(this.rotation + Math.PI), [0, this.reverse_thrust])
+    },
+
+    fire: function() {
+      var rate = (this.powerup_flags & PU_DOUBLERATE) ? autofire_rate * 0.5 : autofire_rate
+      var t = (new Date).getTime()
+      if (t - this.lastFireTime > rate) {
+        this._fire()
+        this.lastFireTime = t
       }
     },
 
     // TODO: Refactor vigorously
-    fire: function() {
+    _fire: function() {
       var opts = {
         type: this.projectile,
         owner: this.id,
@@ -291,10 +298,6 @@ if (typeof window === 'undefined') {
     },
 
     simulate: function(dt, sim) {
-      if (this.local_player) {
-        this.handle_input(sim.input, dt)
-      }
-
       this.health = rangelimit(this.health + this.heal_rate * dt, 0, this.max_health)
 
       removed_powerups = []
