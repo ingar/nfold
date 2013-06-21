@@ -30,7 +30,7 @@ if (typeof window === 'undefined') {
       if (localPlayer) {
         t = (new Date).getTime()
         if (t - last_local_player_broadcast >= 50) {
-          update_data = _.extend(localPlayer.position_data(), {
+          update_data = _.extend(localPlayer.positionData(), {
             name: localPlayer.name
           })
           sim.net.broadcast('entity_update', update_data)
