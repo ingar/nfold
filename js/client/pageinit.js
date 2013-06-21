@@ -1,3 +1,8 @@
+var _ = require('underscore')._
+var pubsub = require('../common/pubsub')
+var GameClient = require('./client').GameClient
+var nfold = require('./config').nfold
+
 $(function() {
 
   var client = new GameClient()

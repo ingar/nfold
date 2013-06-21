@@ -1,30 +1,16 @@
-if (typeof window === 'undefined') {
-  var _ = require('underscore')
+var _ = require('underscore')._
+
+var listeners = {}
+
+exports.publish = function(name, data) {
+  _.each(listeners[name], function(fn) {
+    fn(data)
+  })
 }
 
-pubsub = (function() {
-
-  var listeners = {}
-
-  return {
-    publish: function(name, data) {
-      _.each(listeners[name], function(fn) {
-        fn(data)
-      })
-    },
-
-    subscribe: function(name, fn) {
-      if (!listeners[name]) {
-        listeners[name] = []
-      }
-      listeners[name].push(fn)
-    }
+exports.subscribe = function(name, fn) {
+  if (!listeners[name]) {
+    listeners[name] = []
   }
-
-})()
-
-if (typeof(exports) !== 'undefined') {
-  _.each(pubsub, function(value, key) {
-    exports[key] = value
-  })
+  listeners[name].push(fn)
 }

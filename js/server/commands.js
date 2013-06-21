@@ -1,3 +1,5 @@
+var _ = require('underscore')._
+
 exports.handle_command = function(socket, sim, sender, entity_id, command, args) {
 
   console.log("Command: %s, Arguments: %j", command, args)

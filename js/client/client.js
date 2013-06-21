@@ -1,3 +1,12 @@
+var _ = require('underscore')._
+var simulation = require('../common/simulation')
+var pubsub = require('../common/pubsub')
+var InputManager = require('./input').InputManager
+var CanvasRenderer = require('./canvas_renderer').CanvasRenderer
+var net = require('./net')
+var config = require('./config')
+var game = require('../common/game')
+
 function GameClient() {
   var self = this
 
@@ -26,7 +35,7 @@ function GameClient() {
 }
 
 GameClient.prototype.initNetwork = function() {
-  initClientNetwork(this.sim, this.clientId)
+  net.initClientNetwork(this.sim, this.clientId)
 }
 
 GameClient.prototype.initEvents = function() {
@@ -67,6 +76,7 @@ GameClient.prototype.updateViewport = function(game) {
 }
 
 GameClient.prototype.renderDebug = function() {
+  var nfold = config.nfold
   if (nfold.debug.quadtrees || nfold.debug.collisions) {
     var sim = this.sim
     var collide_things = [sim.world_bounds()]
@@ -106,3 +116,5 @@ GameClient.prototype.setName = function(name) {
     this.player.name = name
   }
 }
+
+exports.GameClient = GameClient

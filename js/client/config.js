@@ -1,4 +1,4 @@
-window.nfold = {
+exports.nfold = {
   background_color: '#222',
   loop_interval: 20,
   debug: {

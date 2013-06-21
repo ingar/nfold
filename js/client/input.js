@@ -13,3 +13,4 @@ function InputManager() {
     return keys[keyCode]
   }
 }
+exports.InputManager = InputManager

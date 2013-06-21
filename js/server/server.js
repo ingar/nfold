@@ -1,6 +1,6 @@
 var _ = require('underscore')
 var sim = require('../common/simulation')
-var entity = require('../common/entity')
+var entity = require('../common/entity/entity')
 var pubsub = require('../common/pubsub')
 var Game = require('../common/game').Game
 var log = require('../common/log')

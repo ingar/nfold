@@ -1,3 +1,4 @@
+var _ = require('underscore')._
 var socketio = require('socket.io')
 var log = require('../common/log')
 var commands = require('./commands')

@@ -1,9 +1,7 @@
-if (typeof(require) === 'function') {
-  _ = require('underscore')
-  require('./math')
-}
+var _ = require('underscore')
+require('./math')
 
-var collide = {}
+var collide = exports
 
 function _intersect_point_point(p, q) {
   return p.x == q.x && p.y == q.y
@@ -210,8 +208,4 @@ collide.QuadTree = function(extents, opts) {
     }
 
   }, opts)
-}
-
-if (typeof(exports) !== 'undefined') {
-  _.each(collide, function(value, key) { exports[key] = value })
 }

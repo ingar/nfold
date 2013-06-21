@@ -1,4 +1,8 @@
-function initClientNetwork(sim, clientId) {
+var _ = require('underscore')._
+var pubsub = require('../common/pubsub')
+var nfold = require('./config').nfold
+
+exports.initClientNetwork = function(sim, clientId) {
   var socket = io.connect()
 
   function network_message(msg, fn) {
