@@ -36,7 +36,6 @@ exports.Powerup = Powerup
 
 function _createPowerup(name, powerupOptions) {
   function fn(opts) {
-    console.log("Creating Powerup",opts)
     Powerup.apply(this, [_.extend(powerupOptions, opts)])
   }
   fn.prototype = new Powerup()

@@ -149,7 +149,6 @@ Player.prototype.add_powerup = function(pu) {
 
 // client, server
 Player.prototype.remove_powerup = function(powerup_type) {
-  console.log("Removing powerup: ", powerup_type)
   delete this.powerups[powerup_type]
   this.powerup_flags = calculate_powerup_flags(this.powerups)
 }
