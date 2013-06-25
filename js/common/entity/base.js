@@ -74,6 +74,8 @@ Entity.prototype._simulate = function(dt, sim) {
   this.updateCollide(dt, sim)
 }
 
+Entity.prototype._from_entity_base = function() {}
+
 _.extend(Entity, {
   MOVE_SERVER:      0x0001,
   SIMULATE_SERVER:  0x0002,
@@ -88,4 +90,3 @@ _.extend(Entity, {
 })
 
 exports.Entity = Entity
-entity.register('Entity', Entity)

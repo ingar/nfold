@@ -16,7 +16,6 @@ function Projectile(opts) {
     age: 0
   }, opts)])
 }
-
 Projectile.prototype = new Entity()
 
 Projectile.prototype.initCollide = function() {

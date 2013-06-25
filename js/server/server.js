@@ -8,7 +8,7 @@ var net = require('./net')
 
 exports.startup = function(httpServer) {
   var POWERUP_SPAWN_FREQUENCY = 1000
-  var MAX_POWERUPS = 100
+  var MAX_POWERUPS = 1
 
   var simulation = sim.Simulation(null, { type: sim.SERVER })
 
@@ -35,7 +35,7 @@ exports.startup = function(httpServer) {
         position: [bounds.min_x + (Math.random() * bounds.max_x - bounds.min_x), bounds.min_y + (Math.random() * bounds.max_y - bounds.min_y)]
       }, true)
       num -= 1
-      log.debug('Spawned a "' + e.powerup_type + '" powerup')
+//      log.debug('Spawned a "' + e.powerup_type + '" powerup')
     }
     return setTimeout(addPowerups, POWERUP_SPAWN_FREQUENCY)
   }

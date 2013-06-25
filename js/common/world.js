@@ -4,8 +4,8 @@ var collide = require('./collide')
 var DEFAULT_OPTS = {
   minX: 0,
   minY: 0,
-  width: 1024,
-  height: 1024
+  width: 256,
+  height: 256
 }
 
 function World(opts) {

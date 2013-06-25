@@ -18,13 +18,17 @@ function Game(opts) {
   _.extend(this, defaults, opts)
 }
 
+function _getCurrentTimeMs() {
+  return (new Date).getTime()
+}
+
 Game.prototype.mainLoop = function() {
   var self = this
-  var lastLoopTime = (new Date).getTime()
+  var loopEndTime = _getCurrentTimeMs()
 
   function loop() {
-    var startTime = (new Date).getTime()
-    self.frameTime = startTime - lastLoopTime
+    var loopStartTime = _getCurrentTimeMs()
+    self.frameTime = loopStartTime - loopEndTime
 
     self.sim.tick(self)
     self.preRender(self)
@@ -33,9 +37,9 @@ Game.prototype.mainLoop = function() {
     }
     self.postRender(self)
 
-    var elapsed = (new Date).getTime() - startTime
+    loopEndTime = _getCurrentTimeMs()
+    var elapsed = loopEndTime - loopStartTime
     setTimeout(loop, Math.max(self.tickInterval - elapsed, 0))
-    lastLoopTime = startTime
   }
   loop()
 }

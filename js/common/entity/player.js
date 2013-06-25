@@ -3,6 +3,7 @@ var Entity = require('./base').Entity
 var powerup = require('./powerup')
 var Powerup = powerup.Powerup
 var entity = require('./entity')
+var pubsub = require('../pubsub')
 
 // Player
 autofire_rate = 250
@@ -112,15 +113,15 @@ Player.prototype.simulate = function(dt, sim) {
 
   removed_powerups = []
 
-  _.each(this.powerups, function(pu) {
+  _.each(this.powerups, function(pu, puName) {
     pu.ttl -= dt
     if (pu.ttl <= 0) {
-      removed_powerups.push(pu)
+      removed_powerups.push(puName)
     }
   })
 
-  _.each(removed_powerups, function(pu) {
-    this.remove_powerup(pu.type)
+  _.each(removed_powerups, function(puName) {
+    this.remove_powerup(puName)
   }, this)
 }
 
@@ -134,18 +135,21 @@ Player.prototype.damage = function(amount, owner) {
 }
 
 // server
-Player.prototype.add_powerup = function(powerup_type) {
+Player.prototype.add_powerup = function(pu) {
   if (this.sim.type != 'server') {
     return
   }
-
-  this.powerups[powerup_type] = powerup.powerups.create(powerup_type)
+  this.powerups[pu.powerup_type] = {
+    ttl: pu.ttl,
+    flags: pu.powerup_flags
+  }
   this.powerup_flags = calculate_powerup_flags(this.powerups)
   this.sim.net.broadcast('entity_update', { id: this.id, powerups: this.powerups, powerup_flags: this.powerup_flags })
 }
 
 // client, server
 Player.prototype.remove_powerup = function(powerup_type) {
+  console.log("Removing powerup: ", powerup_type)
   delete this.powerups[powerup_type]
   this.powerup_flags = calculate_powerup_flags(this.powerups)
 }

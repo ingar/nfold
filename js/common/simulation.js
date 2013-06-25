@@ -95,7 +95,8 @@ var Simulation = function(opts) {
         return self.quadtree.each_object(player.collide, function(collidee) {
           var e, handler
           e = collidee.entity
-          handler = e[('collide_' + player.type).toLowerCase()]
+          var collideFnName = ('collide_' + player.type).toLowerCase()
+          handler = e[collideFnName]
           if ((handler != null) && e !== player && e.owner !== player.id) {
             return handler.call(e, player)
           }
@@ -107,10 +108,8 @@ var Simulation = function(opts) {
     },
 
     spawn: function(opts, broadcast) {
-      var e
-      e = entity.create(_.extend({
-        sim: this
-      }, opts))
+      var e = entity.create(_.extend({ sim: this }, opts))
+
       if ((this.type === exports.CLIENT && !(e.flags & Entity.SPAWN_CLIENT)) || (this.type === exports.SERVER && !(e.flags & Entity.SPAWN_SERVER))) {
         return
       }
