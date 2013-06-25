@@ -35,7 +35,7 @@ exports.setupServer = function(httpServer, sim) {
       })
     }
     socket.emit('sync', {
-      data: _.map(sim.get_objects(), function(o) {
+      data: _.map(sim.getObjects(), function(o) {
         return o.serialize()
       })
     })
@@ -49,7 +49,7 @@ exports.setupServer = function(httpServer, sim) {
       })
     })
     network_message('entity_update', function(data) {
-      return sim.update_entity(data)
+      return sim.updateEntity(data)
     })
     network_message('new_entities', function(data) {
       return _.each(data, function(opts) {

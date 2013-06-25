@@ -4,7 +4,7 @@ exports.handle_command = function(socket, sim, sender, entity_id, command, args)
 
   console.log("Command: %s, Arguments: %j", command, args)
 
-  var player_entity = sim.find_entity(entity_id)
+  var player_entity = sim.findEntity(entity_id)
 
   function reply(s) {
     socket.emit('chat', { data: { sender: 'server', text: s } })

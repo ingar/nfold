@@ -26,7 +26,7 @@ exports.initClientNetwork = function(sim, clientId) {
   })
 
   network_message('entity_update', function(data) {
-    sim.update_entity(data)
+    sim.updateEntity(data)
   })
 
   network_message('new_entities', function(data) {

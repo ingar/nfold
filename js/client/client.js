@@ -12,7 +12,7 @@ function GameClient() {
 
   this.clientId = 'client:' + Math.round(Math.random() * 0xFFFFFFFF).toString(16)
   this.input = new InputManager()
-  this.sim = simulation.Simulation({ type: simulation.CLIENT })
+  this.sim = new simulation.Simulation({ type: simulation.CLIENT })
   this.player = null
   this.renderer = new CanvasRenderer(document.querySelector('.main canvas'))
 

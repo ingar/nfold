@@ -10,11 +10,11 @@ exports.startup = function(httpServer) {
   var POWERUP_SPAWN_FREQUENCY = 1000
   var MAX_POWERUPS = 1
 
-  var simulation = sim.Simulation(null, { type: sim.SERVER })
+  var simulation = new sim.Simulation({ type: sim.SERVER })
 
   var countPowerups = function() {
     var total = 0
-    simulation.each_entity(null, function(e) {
+    simulation.eachEntity(null, function(e) {
       if (e.type.match(/^powerup_/)) {
         return total += 1
       }

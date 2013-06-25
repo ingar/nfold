@@ -6,18 +6,142 @@ var Entity = require('./entity/base').Entity
 var entity = require('./entity/entity')
 var world = require('./world')
 
-// TODO: Inject this into game
-var gameWorld = new world.World()
+function Simulation(opts) {
 
-var setupSimulationEvents = function(sim) {
+  this.world = new world.World() // TODO: Inject this into game
+  this.quadtree = this._createQuadtree()
+
+  _.extend(this, {
+    type: exports.SERVER,
+    collide_type: collide.CLIENT,
+    broadcast_entities: [],
+    net: {
+      broadcast: function() {},
+      send: function() {}
+    }
+  }, opts)
+
+  this._setupSimulationEvents(this)
+}
+
+Simulation.prototype.tick = function(game) {
+  var collidees = []
+  var self = this
+  var elapsedSecs = game.frameTime * 0.001
+  self.quadtree = this._createQuadtree()
+
+  this.world.eachEntity(function(ent) {
+    ent._simulate(elapsedSecs, self)
+    if (ent.remove_me) {
+      self.world.remove(ent)
+    } else {
+      self.quadtree.insert(ent.collide)
+      if ((self.type === exports.SERVER && (ent.flags & Entity.COLLIDE_SERVER)) || (self.type === exports.CLIENT && (ent.flags & Entity.COLLIDE_CLIENT))) {
+        collidees.push(ent)
+      }
+    }
+  })
+
+  self.checkCollisions(collidees)
+  if (this.broadcast_entities.length > 0) {
+    this.net.broadcast('new_entities', _.map(this.broadcast_entities, function(o) { return o.serialize() }))
+  }
+  pubsub.publish('sim_endframe', self)
+  this.broadcast_entities = []
+}
+
+
+Simulation.prototype.checkCollisions = function(players) {
+  var self = this
+  _.each(players, function(player) {
+    self.quadtree.each_object(player.collide, function(collidee) {
+      var ent = collidee.entity
+      var handler = ent[('collide_' + player.type).toLowerCase()]
+      if ((handler != null) && ent !== player && ent.owner !== player.id) {
+        handler.call(ent, player)
+      }
+    })
+  })
+}
+
+Simulation.prototype.findEntity = function(id) {
+  return this.world.get(id)
+}
+
+Simulation.prototype.spawn = function(opts, broadcast) {
+  var ent = entity.create(_.extend({ sim: this }, opts))
+
+  if ((this.type === exports.CLIENT && !(ent.flags & Entity.SPAWN_CLIENT)) || (this.type === exports.SERVER && !(ent.flags & Entity.SPAWN_SERVER))) {
+    return
+  }
+  this.world.add(ent)
+  ent.spawn()
+  if (broadcast) {
+    this.broadcast_entities.push(ent)
+  }
+  return ent
+}
+
+Simulation.prototype.deserialize = function(opts) {
+  this.world.add(entity.create(_.extend({ sim: this }, opts)))
+}
+
+Simulation.prototype.kill = function(id, broadcast) {
+  var ent = this.world.get(id)
+  if (ent) {
+    ent.kill()
+
+    // TODO: move this
+    if (broadcast) {
+      return this.net.broadcast('kill', ent.id)
+    }
+  }
+}
+
+Simulation.prototype.updateEntity = function(data) {
+  this.world.updateEntity(data.id, function(ent) {
+    _.extend(ent, data)
+  })
+}
+
+Simulation.prototype.synchronize = function(ents) {
+  this.world.clear()
+  _.each(ents, (function(opts) {
+    this.deserialize(opts)
+  }), this)
+}
+
+Simulation.prototype.getObjects = function() {
+  // TODO: don't reach into gameWorld
+  return _.values(this.world.entities)
+}
+
+Simulation.prototype.eachEntity = function(bounds, fn) {
+  this.quadtree.each_object(bounds, function(o) {
+    fn(o.entity)
+  })
+}
+
+Simulation.prototype.getWorld = function() { return this.world }
+
+Simulation.prototype.world_bounds = function() {
+  return this.world.bounds
+}
+
+Simulation.prototype.randomLocation = function() {
+  return this.world.randomLocation()
+}
+
+Simulation.prototype._setupSimulationEvents = function(sim) {
   pubsub.subscribe('damage', function(data) {
-    return sim.net.broadcast('entity_update', {
+    sim.net.broadcast('entity_update', {
       id: data.entity.id,
       health: data.entity.health
     })
   })
+
   pubsub.subscribe('killed', function(entity_id) {
-    return sim.net.broadcast('kill', entity_id)
+    sim.net.broadcast('kill', entity_id)
   })
 
   var last_local_player_broadcast = 0
@@ -31,146 +155,21 @@ var setupSimulationEvents = function(sim) {
           name: localPlayer.name
         })
         sim.net.broadcast('entity_update', update_data)
-        return last_local_player_broadcast = t
+        last_local_player_broadcast = t
       }
     }
   })
+
   pubsub.subscribe('entity:add_powerup', function(data) {
-    return sim.getWorld[data.entity_id].add_powerup(data.powerup_type)
+    sim.getWorld[data.entity_id].add_powerup(data.powerup_type)
   })
 }
 
-var Simulation = function(opts) {
-  var collidees = []
-
-  var create_quadtree = function() {
-    return collide.QuadTree(gameWorld.bounds, {
-      max_depth: 5,
-      threshold: 8
-    })
-  }
-
-  var sim = {
-    type: exports.SERVER,
-    collide_type: collide.CLIENT,
-    quadtree: create_quadtree(),
-    broadcast_entities: [],
-    net: {
-      broadcast: function() {},
-      send: function() {}
-    },
-
-    tick: function(game) {
-      var elapsedSecs = game.frameTime * 0.001
-      var self = this
-      self.quadtree = create_quadtree()
-      collidees = []
-
-      gameWorld.eachEntity(function(o) {
-        o._simulate(elapsedSecs, self)
-        if (o.remove_me) {
-          return gameWorld.remove(o)
-        } else {
-          self.quadtree.insert(o.collide)
-          if ((self.type === exports.SERVER && (o.flags & Entity.COLLIDE_SERVER)) || (self.type === exports.CLIENT && (o.flags & Entity.COLLIDE_CLIENT))) {
-            return collidees.push(o)
-          }
-        }
-      })
-
-      self.check_collisions(collidees)
-      if (this.broadcast_entities.length > 0) {
-        this.net.broadcast('new_entities', _.map(this.broadcast_entities, function(o) {
-          return o.serialize()
-        }))
-      }
-      pubsub.publish('sim_endframe', self)
-      this.broadcast_entities = []
-    },
-
-    check_collisions: function(players) {
-      var self
-      self = this
-      return _.each(players, function(player) {
-        return self.quadtree.each_object(player.collide, function(collidee) {
-          var e, handler
-          e = collidee.entity
-          var collideFnName = ('collide_' + player.type).toLowerCase()
-          handler = e[collideFnName]
-          if ((handler != null) && e !== player && e.owner !== player.id) {
-            return handler.call(e, player)
-          }
-        })
-      })
-    },
-    find_entity: function(id) {
-      return gameWorld.get(id)
-    },
-
-    spawn: function(opts, broadcast) {
-      var e = entity.create(_.extend({ sim: this }, opts))
-
-      if ((this.type === exports.CLIENT && !(e.flags & Entity.SPAWN_CLIENT)) || (this.type === exports.SERVER && !(e.flags & Entity.SPAWN_SERVER))) {
-        return
-      }
-      gameWorld.add(e)
-      e.spawn()
-      if (broadcast) {
-        this.broadcast_entities.push(e)
-      }
-      return e
-    },
-    deserialize: function(opts) {
-      return gameWorld.add(entity.create(_.extend({
-        sim: this
-      }, opts)))
-    },
-
-    kill: function(id, broadcast) {
-      var o = gameWorld.get(id)
-      if (o) {
-        o.kill()
-
-        // TODO: move this
-        if (broadcast) {
-          return this.net.broadcast('kill', o.id)
-        }
-      }
-    },
-    update_entity: function(data) {
-      var o = gameWorld.get(data.id)
-      if (o) {
-        return _.extend(o, data)
-      }
-    },
-    synchronize: function(entities) {
-      gameWorld.clear()
-      return _.each(entities, (function(opts) {
-        return this.deserialize(opts)
-      }), this)
-    },
-    get_objects: function() {
-      // TODO: don't reach into gameWorld
-      return _.values(gameWorld.entities)
-    },
-    each_entity: function(bounds, fn) {
-      return this.quadtree.each_object(bounds, function(o) {
-        return fn(o.entity)
-      })
-    },
-    getWorld: function() { return gameWorld },
-
-    world_bounds: function() {
-      return gameWorld.bounds
-    },
-    randomLocation: function() {
-      return gameWorld.randomLocation()
-    }
-  }
-
-  setupSimulationEvents(sim)
-
-  return _.extend(sim, opts)
+Simulation.prototype._createQuadtree = function() {
+  return collide.QuadTree(this.world.bounds, {
+    max_depth: 5,
+    threshold: 8
+  })
 }
 
 exports.SERVER = 'server'

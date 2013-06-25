@@ -48,7 +48,7 @@ CanvasRenderer.prototype.renderScene = function(game) {
   )
 
   var render_count = 0
-  sim.each_entity(view, function(entity) {
+  sim.eachEntity(view, function(entity) {
     self.renderEntity(entity, ctx)
     render_count += 1
   })

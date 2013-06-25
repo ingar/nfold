@@ -56,6 +56,12 @@ _.extend(World.prototype, {
       Math.random() * (this.opts.width) + this.opts.minX,
       Math.random() * (this.opts.height) + this.opts.minY
     ]
+  },
+
+  updateEntity: function(id, fn) {
+    var entity = this.get(id)
+    if (entity) { fn(entity) }
+    return entity
   }
 })
 
