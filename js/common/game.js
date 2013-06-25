@@ -27,8 +27,8 @@ Game.prototype.mainLoop = function() {
   var loopEndTime = _getCurrentTimeMs()
 
   function loop() {
-    var loopStartTime = _getCurrentTimeMs()
-    self.frameTime = loopStartTime - loopEndTime
+    self.curTime = _getCurrentTimeMs()
+    self.frameTime = self.curTime - loopEndTime
 
     self.sim.tick(self)
     self.preRender(self)
@@ -38,7 +38,7 @@ Game.prototype.mainLoop = function() {
     self.postRender(self)
 
     loopEndTime = _getCurrentTimeMs()
-    var elapsed = loopEndTime - loopStartTime
+    var elapsed = loopEndTime - self.curTime
     setTimeout(loop, Math.max(self.tickInterval - elapsed, 0))
   }
   loop()
