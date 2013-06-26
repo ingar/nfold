@@ -32,7 +32,9 @@ function Player(opts) {
     max_health: 100,
     powerup_flags: 0x0,
     powerups: {},
-    projectile: 'Projectile'
+    projectile: 'Projectile',
+
+    score: 0
   }, opts)])
 }
 
@@ -126,10 +128,10 @@ Player.prototype.simulate = function(dt, sim) {
 }
 
 Player.prototype.damage = function(amount, ownerId) {
-  console.log("Player " + this.name + " damaged by " + this.sim.world.get(ownerId).name)
   this.health -= amount
   if (this.health <= 0) {
     this.kill()
+    pubsub.publish('score', { id: ownerId })
   } else {
     pubsub.publish('damage', { entity: this, amount: amount })
   }

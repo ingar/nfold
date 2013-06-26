@@ -94,7 +94,7 @@ CanvasRenderer.prototype._prerender = function(entity) {
   if (entity.type === 'Player') {
     ctx.fillStyle = '#fff'
     ctx.textAlign = 'center'
-    ctx.fillText(entity.name + ' (' + entity.health.toFixed(1) + ')', 0, 20)
+    ctx.fillText(entity.name + ':' + entity.score + ' (' + entity.health.toFixed(1) + ')', 0, 20)
   }
   ctx.rotate(entity.rotation)
 }

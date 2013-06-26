@@ -39,9 +39,12 @@ Entity.prototype.rotate = function(theta) {
 
 Entity.prototype.spawn = function() {}
 
-Entity.prototype.kill = function() {
+Entity.prototype.kill = function(killer) {
   this.remove_me = true
-  pubsub.publish('killed', this.id)
+  pubsub.publish('killed', {
+    id: this.id,
+    killer: killer ? killer.id : null
+  })
 }
 
 Entity.prototype.positionData = function() {

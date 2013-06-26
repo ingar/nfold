@@ -35,8 +35,8 @@ GameClient.prototype.initNetwork = function() {
 
 GameClient.prototype.initEvents = function() {
   var self = this
-  pubsub.subscribe('killed', function(entity_id) {
-    if (self.player && self.player.id === entity_id) {
+  pubsub.subscribe('killed', function(data) {
+    if (self.player && self.player.id === data.id) {
       self.player = null
     }
   })

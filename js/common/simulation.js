@@ -103,6 +103,8 @@ Simulation.prototype.synchronize = function(ents) {
 }
 
 Simulation.prototype._setupSimulationEvents = function(sim) {
+  var self = this
+
   pubsub.subscribe('damage', function(data) {
     sim.net.broadcast('entity_update', {
       id: data.entity.id,
@@ -110,8 +112,20 @@ Simulation.prototype._setupSimulationEvents = function(sim) {
     })
   })
 
-  pubsub.subscribe('killed', function(id) {
-    sim.net.broadcast('kill', id)
+  pubsub.subscribe('killed', function(data) {
+    sim.net.broadcast('kill', data.id)
+  })
+
+  pubsub.subscribe('score', function(data) {
+    if (data.id) {
+      var player = self.world.get(data.id)
+      player.score += 1
+      console.log("Player " + player.name + " score: " + player.score)
+      sim.net.broadcast('entity_update', {
+        id: player.id,
+        score: player.score
+      })
+    }
   })
 
   var last_local_player_broadcast = 0
