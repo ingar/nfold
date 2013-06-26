@@ -13,9 +13,3 @@ $ node app.js
 npm install -g browserify
 browserify js/client/pageinit.js -o js/build/nfold_client.js
 ```
-
-### Notes
-Responsibilities:
-World - Contain Entities and answer queries about where they are
-Simulation - Update Entity state, emit events about the Entities
-Game - Insert Entities into the world based on Player input, main input, sim, render loop
