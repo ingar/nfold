@@ -1,26 +1,20 @@
 var _ = require('underscore')._
-var simulation = require('../common/simulation')
 var pubsub = require('../common/pubsub')
 var InputManager = require('./input').InputManager
 var CanvasRenderer = require('./canvas_renderer').CanvasRenderer
 var net = require('./net')
 var config = require('./config')
-var game = require('../common/game')
+var NFold = require('../common/nfold').NFold
 
 function GameClient() {
   var self = this
 
   this.clientId = 'client:' + Math.round(Math.random() * 0xFFFFFFFF).toString(16)
   this.input = new InputManager()
-  this.sim = new simulation.Simulation({ type: simulation.CLIENT })
   this.player = null
   this.renderer = new CanvasRenderer(document.querySelector('.main canvas'))
 
-  this.initNetwork()
-  this.initEvents()
-
-  this.game = new game.Game({
-    sim: this.sim,
+  this.nfold = new NFold(false, {
     renderer: this.renderer,
     preRender: function() {
       self.handleInput()
@@ -31,11 +25,13 @@ function GameClient() {
     }
   })
 
-  this.game.mainLoop()
+  this.initNetwork()
+  this.initEvents()
+  this.nfold.run()
 }
 
 GameClient.prototype.initNetwork = function() {
-  net.initClientNetwork(this.sim, this.clientId)
+  net.initClientNetwork(this.nfold.sim, this.clientId)
 }
 
 GameClient.prototype.initEvents = function() {
@@ -47,7 +43,7 @@ GameClient.prototype.initEvents = function() {
   })
 
   pubsub.subscribe('new_chat', function(data) {
-    self.sim.net.broadcast('chat', data)
+    self.nfold.sim.net.broadcast('chat', data)
     pubsub.publish('chat', data)
   })
 }
@@ -57,7 +53,7 @@ GameClient.prototype.handleInput = function() {
     return
   }
 
-  var frameTime = this.game.frameTime * 0.001
+  var frameTime = this.nfold.game.frameTime * 0.001
   var player = this.player
   var input = this.input
 
@@ -78,9 +74,9 @@ GameClient.prototype.updateViewport = function(game) {
 GameClient.prototype.renderDebug = function() {
   var nfold = config.nfold
   if (nfold.debug.quadtrees || nfold.debug.collisions) {
-    var sim = this.sim
-    var collide_things = [sim.world_bounds()]
-    sim.quadtree.each_node(sim.world_bounds(), function(node) {
+    var sim = this.nfold.sim
+    var collide_things = [this.nfold.world.bounds]
+    sim.quadtree.each_node(this.nfold.world.bounds, function(node) {
       if (nfold.debug.quadtrees) collide_things.push(node.extents)
       if (nfold.debug.collisions) {
         _.each(node.objects, function(o) {
@@ -96,14 +92,13 @@ GameClient.prototype.joinGame = function(name) {
   if (this.player) {
     return
   }
-
-  this.player = this.sim.spawn({
+  this.player = this.nfold.sim.spawn({
     id: this.clientId,
     type: 'Player',
     local_player: true,
     debug: false,
     name: name,
-    position: this.sim.randomLocation()
+    position: this.nfold.world.randomLocation()
   }, true)
 }
 

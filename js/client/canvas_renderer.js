@@ -12,7 +12,7 @@ function CanvasRenderer(canvas) {
 CanvasRenderer.prototype.renderScene = function(game) {
   var self = this
   var ctx = this.ctx
-  var sim = game.sim
+  var world = game.world
 
   ctx.save()
 
@@ -39,18 +39,16 @@ CanvasRenderer.prototype.renderScene = function(game) {
 
   // draw boundary of the world
   ctx.strokeStyle = 'gray'
-  var world_bounds = sim.world_bounds()
+  var bounds = world.bounds
   ctx.strokeRect(
-    world_bounds.min_x,
-    world_bounds.min_y,
-    world_bounds.max_x - world_bounds.min_x,
-    world_bounds.max_y - world_bounds.min_y
+    bounds.min_x,
+    bounds.min_y,
+    bounds.max_x - bounds.min_x,
+    bounds.max_y - bounds.min_y
   )
 
-  var render_count = 0
-  sim.eachEntity(view, function(entity) {
+  game.sim.eachEntity(view, function(entity) {
     self.renderEntity(entity, ctx)
-    render_count += 1
   })
   ctx.restore()
 }

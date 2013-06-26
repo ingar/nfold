@@ -4,22 +4,20 @@ require('./entity/powerup')
 require('./entity/projectile')
 
 var _ = require('underscore')._
-var log = require('../common/log')
+
+function _getCurrentTimeMs() {
+  return (new Date).getTime()
+}
 
 function Game(opts) {
-  var defaults = {
+  _.extend(this, {
     tickInterval: 20,
     frameTime: 0,
     sim: null,
     world: null,
     preRender: function() {},
     postRender: function() {}
-  }
-  _.extend(this, defaults, opts)
-}
-
-function _getCurrentTimeMs() {
-  return (new Date).getTime()
+  }, opts)
 }
 
 Game.prototype.mainLoop = function() {
@@ -45,4 +43,3 @@ Game.prototype.mainLoop = function() {
 }
 
 exports.Game = Game
-

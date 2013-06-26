@@ -8,11 +8,8 @@ var world = require('./world')
 
 function Simulation(opts) {
 
-  this.world = new world.World() // TODO: Inject this into game
-  this.quadtree = this._createQuadtree()
-
   _.extend(this, {
-    type: exports.SERVER,
+    type: Simulation.SERVER,
     collide_type: collide.CLIENT,
     broadcast_entities: [],
     net: {
@@ -21,6 +18,7 @@ function Simulation(opts) {
     }
   }, opts)
 
+  this.quadtree = this._createQuadtree()
   this._setupSimulationEvents(this)
 }
 
@@ -36,7 +34,7 @@ Simulation.prototype.tick = function(game) {
       self.world.remove(ent)
     } else {
       self.quadtree.insert(ent.collide)
-      if ((self.type === exports.SERVER && (ent.flags & Entity.COLLIDE_SERVER)) || (self.type === exports.CLIENT && (ent.flags & Entity.COLLIDE_CLIENT))) {
+      if ((self.type === Simulation.SERVER && (ent.flags & Entity.COLLIDE_SERVER)) || (self.type === Simulation.CLIENT && (ent.flags & Entity.COLLIDE_CLIENT))) {
         collidees.push(ent)
       }
     }
@@ -71,7 +69,7 @@ Simulation.prototype.findEntity = function(id) {
 Simulation.prototype.spawn = function(opts, broadcast) {
   var ent = entity.create(_.extend({ sim: this }, opts))
 
-  if ((this.type === exports.CLIENT && !(ent.flags & Entity.SPAWN_CLIENT)) || (this.type === exports.SERVER && !(ent.flags & Entity.SPAWN_SERVER))) {
+  if ((this.type === Simulation.CLIENT && !(ent.flags & Entity.SPAWN_CLIENT)) || (this.type === Simulation.SERVER && !(ent.flags & Entity.SPAWN_SERVER))) {
     return
   }
   this.world.add(ent)
@@ -124,14 +122,6 @@ Simulation.prototype.eachEntity = function(bounds, fn) {
 
 Simulation.prototype.getWorld = function() { return this.world }
 
-Simulation.prototype.world_bounds = function() {
-  return this.world.bounds
-}
-
-Simulation.prototype.randomLocation = function() {
-  return this.world.randomLocation()
-}
-
 Simulation.prototype._setupSimulationEvents = function(sim) {
   pubsub.subscribe('damage', function(data) {
     sim.net.broadcast('entity_update', {
@@ -147,7 +137,7 @@ Simulation.prototype._setupSimulationEvents = function(sim) {
   var last_local_player_broadcast = 0
   pubsub.subscribe('sim_endframe', function(sim) {
     var t, update_data
-    var localPlayer = sim.getWorld().localPlayer
+    var localPlayer = sim.world.localPlayer
     if (localPlayer) {
       t = (new Date).getTime()
       if (t - last_local_player_broadcast >= 50) {
@@ -159,10 +149,6 @@ Simulation.prototype._setupSimulationEvents = function(sim) {
       }
     }
   })
-
-  pubsub.subscribe('entity:add_powerup', function(data) {
-    sim.getWorld[data.entity_id].add_powerup(data.powerup_type)
-  })
 }
 
 Simulation.prototype._createQuadtree = function() {
@@ -172,7 +158,7 @@ Simulation.prototype._createQuadtree = function() {
   })
 }
 
-exports.SERVER = 'server'
-exports.CLIENT = 'client'
+Simulation.SERVER = 'server'
+Simulation.CLIENT = 'client'
 
 exports.Simulation = Simulation

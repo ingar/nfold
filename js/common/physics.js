@@ -1,9 +1,7 @@
-// TODO: Change calling convention (pass in entity)
 exports.none = function(dt, sim) {}
 
-// TODO: Change calling convention (pass in entity)
 exports.standard = function(dt, sim) {
-  var drag, newPos, speed, worldBounds
+  var drag, newPos, speed
 
   if (vec2.nonzero(this.acceleration)) {
     this.velocity = vec2.add(this.velocity, vec2.scale(this.acceleration, dt))
@@ -15,7 +13,7 @@ exports.standard = function(dt, sim) {
 
   if (vec2.nonzero(this.velocity)) {
 
-    worldBounds = sim.world_bounds()
+    var bounds = sim.world.bounds
 
     if (this.drag_coefficient) {
       speed = vec2.length(this.velocity)
@@ -25,14 +23,14 @@ exports.standard = function(dt, sim) {
 
     newPos = vec2.add(this.position, vec2.scale(this.velocity, dt))
 
-    this.position = [rangelimit(newPos[0], worldBounds.min_x, worldBounds.max_x - 0.00001), rangelimit(newPos[1], worldBounds.min_y, worldBounds.max_y - 0.00001)]
+    this.position = [rangelimit(newPos[0], bounds.min_x, bounds.max_x - 0.00001), rangelimit(newPos[1], bounds.min_y, bounds.max_y - 0.00001)]
 
     // Stop x/y velocity when we hit the world bounds
-    if (this.position[0] === worldBounds.min_x || this.position[0] === worldBounds.max_x) {
+    if (this.position[0] === bounds.min_x || this.position[0] === bounds.max_x) {
       this.velocity[0] = 0
     }
 
-    if (this.position[1] === worldBounds.min_y || this.position[1] === worldBounds.max_y) {
+    if (this.position[1] === bounds.min_y || this.position[1] === bounds.max_y) {
       this.velocity[1] = 0
     }
   }
