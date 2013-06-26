@@ -18,6 +18,23 @@ function World(opts) {
   })
 }
 
+// Regenerates our quadtree with newly-position entities
+World.prototype.beginQueries = function () {
+  this.quadtree = collide.QuadTree(this.bounds, {
+    max_depth: 5,
+    threshold: 8
+  })
+  _.each(this.entities, function(ent) {
+    this.quadtree.insert(ent.collide)
+  }, this)
+}
+
+World.prototype.eachIntersectingEntity = function(collide, fn) {
+  this.quadtree.each_object(collide, function(other) {
+    fn(other.entity)
+  })
+}
+
 World.prototype.add = function (entity) {
   this.entities[entity.id] = entity
 
@@ -42,7 +59,7 @@ World.prototype.get = function (entityId) {
   return this.entities[entityId]
 }
 
-World.prototype.eachEntity = function (cb) {
+World.prototype.allEntities = function (cb) {
   _.each(this.entities, cb)
 }
 

@@ -47,7 +47,7 @@ CanvasRenderer.prototype.renderScene = function(game) {
     bounds.max_y - bounds.min_y
   )
 
-  game.sim.eachEntity(view, function(entity) {
+  world.eachIntersectingEntity(view, function(entity) {
     self.renderEntity(entity, ctx)
   })
   ctx.restore()

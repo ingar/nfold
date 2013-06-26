@@ -1,7 +1,6 @@
 var _ = require('underscore')
 require('./math')
 var pubsub = require('./pubsub')
-var collide = require('./collide')
 var Entity = require('./entity/base').Entity
 var entity = require('./entity/entity')
 var world = require('./world')
@@ -10,7 +9,6 @@ function Simulation(opts) {
 
   _.extend(this, {
     type: Simulation.SERVER,
-    collide_type: collide.CLIENT,
     broadcast_entities: [],
     net: {
       broadcast: function() {},
@@ -18,7 +16,6 @@ function Simulation(opts) {
     }
   }, opts)
 
-  this.quadtree = this._createQuadtree()
   this._setupSimulationEvents(this)
 }
 
@@ -26,20 +23,17 @@ Simulation.prototype.tick = function(game) {
   var collidees = []
   var self = this
   var elapsedSecs = game.frameTime * 0.001
-  self.quadtree = this._createQuadtree()
 
-  this.world.eachEntity(function(ent) {
+  this.world.allEntities(function(ent) {
     ent._simulate(elapsedSecs, self)
     if (ent.remove_me) {
       self.world.remove(ent)
     } else {
-      self.quadtree.insert(ent.collide)
       if ((self.type === Simulation.SERVER && (ent.flags & Entity.COLLIDE_SERVER)) || (self.type === Simulation.CLIENT && (ent.flags & Entity.COLLIDE_CLIENT))) {
         collidees.push(ent)
       }
     }
   })
-
   self.checkCollisions(collidees)
   if (this.broadcast_entities.length > 0) {
     this.net.broadcast('new_entities', _.map(this.broadcast_entities, function(o) { return o.serialize() }))
@@ -48,12 +42,11 @@ Simulation.prototype.tick = function(game) {
   this.broadcast_entities = []
 }
 
-
 Simulation.prototype.checkCollisions = function(players) {
   var self = this
+  self.world.beginQueries()
   _.each(players, function(player) {
-    self.quadtree.each_object(player.collide, function(collidee) {
-      var ent = collidee.entity
+    self.world.eachIntersectingEntity(player.collide, function(ent) {
       var handler = ent[('collide_' + player.type).toLowerCase()]
       if ((handler != null) && ent !== player && ent.owner !== player.id) {
         handler.call(ent, player)
@@ -109,19 +102,6 @@ Simulation.prototype.synchronize = function(ents) {
   }), this)
 }
 
-Simulation.prototype.getObjects = function() {
-  // TODO: don't reach into gameWorld
-  return _.values(this.world.entities)
-}
-
-Simulation.prototype.eachEntity = function(bounds, fn) {
-  this.quadtree.each_object(bounds, function(o) {
-    fn(o.entity)
-  })
-}
-
-Simulation.prototype.getWorld = function() { return this.world }
-
 Simulation.prototype._setupSimulationEvents = function(sim) {
   pubsub.subscribe('damage', function(data) {
     sim.net.broadcast('entity_update', {
@@ -148,13 +128,6 @@ Simulation.prototype._setupSimulationEvents = function(sim) {
         last_local_player_broadcast = t
       }
     }
-  })
-}
-
-Simulation.prototype._createQuadtree = function() {
-  return collide.QuadTree(this.world.bounds, {
-    max_depth: 5,
-    threshold: 8
   })
 }
 

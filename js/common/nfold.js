@@ -26,7 +26,7 @@ NFold.prototype.run = function() {
 
 NFold.prototype._countPowerups = function() {
   var total = 0
-  this.sim.eachEntity(null, function(ent) {
+  this.world.allEntities(function(ent) {
     if (ent.type.match(/^powerup_/)) { total += 1 }
   })
   return total

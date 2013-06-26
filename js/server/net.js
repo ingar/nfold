@@ -35,7 +35,7 @@ exports.setupServer = function(httpServer, sim) {
       })
     }
     socket.emit('sync', {
-      data: _.map(sim.getObjects(), function(o) {
+      data: _.map(_.values(sim.world.entities), function(o) {
         return o.serialize()
       })
     })
