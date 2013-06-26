@@ -11,7 +11,7 @@ $ node app.js
 [Browserify](http://browserify.org) is used to build the client.
 ```
 npm install -g browserify
-browserify js/client/pageinit.js -o js/build/nfold.js 
+browserify js/client/pageinit.js -o js/build/nfold_client.js
 ```
 
 ### Notes

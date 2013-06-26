@@ -3,7 +3,6 @@ var pubsub = require('../common/pubsub')
 var InputManager = require('./input').InputManager
 var CanvasRenderer = require('./canvas_renderer').CanvasRenderer
 var net = require('./net')
-var config = require('./config')
 var NFold = require('../common/nfold').NFold
 
 function GameClient() {
@@ -72,13 +71,11 @@ GameClient.prototype.updateViewport = function(game) {
 }
 
 GameClient.prototype.renderDebug = function() {
-  var nfold = config.nfold
-  if (nfold.debug.quadtrees || nfold.debug.collisions) {
-    var sim = this.nfold.sim
+  if (nfold_opts.debug_quadtrees || nfold_opts.debug_collisions) {
     var collide_things = [this.nfold.world.bounds]
-    sim.quadtree.each_node(this.nfold.world.bounds, function(node) {
-      if (nfold.debug.quadtrees) collide_things.push(node.extents)
-      if (nfold.debug.collisions) {
+    this.nfold.world.quadtree.each_node(this.nfold.world.bounds, function(node) {
+      if (nfold_opts.debug_quadtrees) collide_things.push(node.extents)
+      if (nfold_opts.debug_collisions) {
         _.each(node.objects, function(o) {
           collide_things.push(o)
         })

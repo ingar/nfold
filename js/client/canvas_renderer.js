@@ -1,6 +1,5 @@
 var _ = require('underscore')._
 var collide = require('../common/collide')
-var nfold = require('./config').nfold
 
 var entityRenderers = {}
 
@@ -16,7 +15,7 @@ CanvasRenderer.prototype.renderScene = function(game) {
 
   ctx.save()
 
-  ctx.fillStyle = nfold.background_color
+  ctx.fillStyle = '#222'
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
   var view = this.viewport
@@ -194,7 +193,6 @@ entityRenderers.debug = function(o, ctx) {
   _circle(ctx, o.radius, 'green')
   ctx.stroke()
 }
-
 
 exports.CanvasRenderer = CanvasRenderer
 

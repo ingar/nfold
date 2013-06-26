@@ -1,19 +1,18 @@
 var _ = require('underscore')._
 var pubsub = require('../common/pubsub')
-var nfold = require('./config').nfold
 
 exports.initClientNetwork = function(sim, clientId) {
   var socket = io.connect()
 
   function network_message(msg, fn) {
     socket.on(msg, function(payload) {
-      if (nfold.debug.net && msg !== 'entity_update') { console.log('RECV: %s, %o', msg, payload ? payload.data : null) }
+      if (nfold_opts.debug_net && msg !== 'entity_update') { console.log('RECV: %s, %o', msg, payload ? payload.data : null) }
       fn(payload ? payload.data : null)
     })
   }
 
   sim.net.broadcast = function(msg, data) {
-    if (nfold.debug.net && msg !== 'entity_update') { console.log('SEND: %s, %o', msg, data) }
+    if (nfold_opts.debug_net && msg !== 'entity_update') { console.log('SEND: %s, %o', msg, data) }
     socket.emit(msg, { data: data, broadcast: true })
   }
 

@@ -4,7 +4,7 @@ html
     title !{title}
     script(type='text/javascript', src='/js/vendor/jquery-1.10.1.min.js')
     script(type='text/javascript', src="/socket.io/socket.io.js")
-    script(type='text/javascript', src="/js/build/nfold.js")
+    script(type='text/javascript', src="/js/build/nfold_client.js")
 
     link(rel='stylesheet', href='/styles/main.css')
   body
@@ -27,10 +27,10 @@ html
         section.debug
           ul
             li
-              input.debug#debug_quadtrees(name='debug_quadtrees', value='quadtrees', type='checkbox')
+              input.debug#debug_quadtrees(name='debug_quadtrees', value='debug_quadtrees', type='checkbox')
               label(for='debug_quadtrees') quadtrees
             li
-              input.debug#debug_collisions(name='debug_collisions', value='collisions', type='checkbox')
+              input.debug#debug_collisions(name='debug_collisions', value='debug_collisions', type='checkbox')
               label(for='debug_collisions') collisions
         section.chat_messages
     footer

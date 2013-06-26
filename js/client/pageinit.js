@@ -1,7 +1,12 @@
 var _ = require('underscore')._
 var pubsub = require('../common/pubsub')
 var GameClient = require('./client').GameClient
-var nfold = require('./config').nfold
+
+window.nfold_opts = {
+  debug_quadtreess: false,
+  debug_collisions: false,
+  debug_net: false
+}
 
 $(function() {
 
@@ -56,8 +61,7 @@ $(function() {
   })
 
   $('input.debug:checkbox').change(function() {
-    var key = $(this).val()
-    nfold.debug[key] = $(this).is(':checked')
+    nfold_opts[$(this).val()] = $(this).is(':checked')
   })
 
   pubsub.subscribe('chat', function(data) {
