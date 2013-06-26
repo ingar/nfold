@@ -4,12 +4,12 @@ var Simulation = require('./simulation').Simulation
 var Game = require('./game').Game
 
 var POWERUP_SPAWN_FREQUENCY = 1000
-var MAX_POWERUPS = 1
+var MAX_POWERUPS = 10
 var POWERUP_TYPES = ['doublerate', 'doublespread', 'triplespread', 'nonagun', 'awesomeness']
 
 function NFold(isServer, gameOpts) {
   this.isServer = isServer
-  this.world = new World({ width: 300, height: 300 })
+  this.world = new World({ width: 1024, height: 1024 })
   this.sim = new Simulation({
     type: isServer ? Simulation.SERVER : Simulation.CLIENT,
     world: this.world
