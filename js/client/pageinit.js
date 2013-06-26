@@ -10,7 +10,7 @@ window.nfold_opts = {
 
 $(function() {
 
-  var client = new GameClient()
+  var client = window.nfoldClient = new GameClient()
   var playerName = 'player'
 
   $('span.client-id').html(client.clientId)

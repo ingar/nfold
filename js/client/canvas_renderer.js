@@ -6,6 +6,7 @@ var entityRenderers = {}
 function CanvasRenderer(canvas) {
   this.ctx = canvas.getContext('2d')
   this.viewport = collide.AABB(0, 0, canvas.width, canvas.height)
+  this.headingUp = false
 }
 
 CanvasRenderer.prototype.renderScene = function(game) {
@@ -19,7 +20,15 @@ CanvasRenderer.prototype.renderScene = function(game) {
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
   var view = this.viewport
-  ctx.translate(-view.min_x, -view.min_y)
+  if (this.renderRelative()) {
+    var pos = this.playerPosition.position
+    ctx.translate(-view.min_x, -view.min_y)
+    ctx.translate(pos[0], pos[1])
+    ctx.rotate(-this.playerPosition.rotation + Math.PI)
+    ctx.translate(-pos[0], -pos[1])
+  } else {
+    ctx.translate(-view.min_x, -view.min_y)
+  }
 
   // Draw background
   ctx.beginPath()
@@ -94,13 +103,22 @@ CanvasRenderer.prototype._prerender = function(entity) {
   if (entity.type === 'Player') {
     ctx.fillStyle = '#fff'
     ctx.textAlign = 'center'
+    ctx.save()
+    if (this.renderRelative()) {
+      ctx.rotate(this.playerPosition.rotation + Math.PI)
+    }
     ctx.fillText(entity.name + ':' + entity.score + ' (' + entity.health.toFixed(1) + ')', 0, 20)
+    ctx.restore()
   }
   ctx.rotate(entity.rotation)
 }
 
 CanvasRenderer.prototype._postrender = function() {
   this.ctx.restore()
+}
+
+CanvasRenderer.prototype.renderRelative = function() {
+  return this.headingUp && this.playerPosition
 }
 
 function _radial_powerup(n) {

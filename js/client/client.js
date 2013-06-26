@@ -67,6 +67,7 @@ GameClient.prototype.handleInput = function() {
 GameClient.prototype.updateViewport = function(game) {
   if (this.player) {
     this.renderer.centerOn(this.player)
+    this.renderer.playerPosition = this.player.positionData()
   }
 }
 
