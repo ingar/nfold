@@ -23,7 +23,7 @@ Powerup.prototype.initCollide = function() {
 Powerup.prototype.updateCollide = function() {}
 
 Powerup.prototype.collide_player = function(player) {
-  player.add_powerup(this)
+  player.addPowerup(this)
   this.kill()
 }
 

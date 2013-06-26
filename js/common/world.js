@@ -18,52 +18,52 @@ function World(opts) {
   })
 }
 
-_.extend(World.prototype, {
-  add: function(entity) {
-    this.entities[entity.id] = entity
+World.prototype.add = function (entity) {
+  this.entities[entity.id] = entity
 
-    // TODO: move this logic (and make a flag for this)
-    if (entity.local_player) {
-      this.localPlayer = entity
-    }
-    return entity
-  },
-
-  remove: function(entity) {
-    delete this.entities[entity.id]
-
-    // TODO: move this logic (and make a flag for this)
-    if (entity.local_player) {
-      this.localPlayer = null
-    }
-    return entity
-  },
-
-  get: function(entityId) {
-    return this.entities[entityId]
-  },
-
-  eachEntity: function(cb) {
-    _.each(this.entities, cb)
-  },
-
-  clear: function() {
-    this.entities = {}
-  },
-
-  randomLocation: function() {
-    return [
-      Math.random() * (this.opts.width) + this.opts.minX,
-      Math.random() * (this.opts.height) + this.opts.minY
-    ]
-  },
-
-  updateEntity: function(id, fn) {
-    var entity = this.get(id)
-    if (entity) { fn(entity) }
-    return entity
+  // TODO: move this logic (and make a flag for this)
+  if (entity.local_player) {
+    this.localPlayer = entity
   }
-})
+  return entity
+}
+
+World.prototype.remove = function (entity) {
+  delete this.entities[entity.id]
+
+  // TODO: move this logic (and make a flag for this)
+  if (entity.local_player) {
+    this.localPlayer = null
+  }
+  return entity
+}
+
+World.prototype.get = function (entityId) {
+  return this.entities[entityId]
+}
+
+World.prototype.eachEntity = function (cb) {
+  _.each(this.entities, cb)
+}
+
+World.prototype.clear = function () {
+  this.entities = {}
+}
+
+World.prototype.randomLocation = function () {
+  return [
+    Math.random() * (this.opts.width) + this.opts.minX,
+    Math.random() * (this.opts.height) + this.opts.minY
+  ]
+}
+
+World.prototype.updateEntity = function (id, fn) {
+  var entity = this.get(id)
+  if (entity) {
+    fn(entity)
+  }
+  return entity
+}
 
 exports.World = World
 

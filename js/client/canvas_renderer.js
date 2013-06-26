@@ -64,7 +64,7 @@ CanvasRenderer.prototype.centerOn = function(entity) {
   this.viewport.setCenter(entity.position)
 }
 
-CanvasRenderer.prototype.render_collision_geometry = function(collision_objects) {
+CanvasRenderer.prototype.renderCollisionDebug = function(collision_objects) {
   var ctx = this.ctx
   ctx.save()
   ctx.translate(-this.viewport.min_x, -this.viewport.min_y)

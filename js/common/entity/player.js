@@ -125,7 +125,8 @@ Player.prototype.simulate = function(dt, sim) {
   }, this)
 }
 
-Player.prototype.damage = function(amount, owner) {
+Player.prototype.damage = function(amount, ownerId) {
+  console.log("Player " + this.name + " damaged by " + this.sim.world.get(ownerId).name)
   this.health -= amount
   if (this.health <= 0) {
     this.kill()
@@ -135,7 +136,7 @@ Player.prototype.damage = function(amount, owner) {
 }
 
 // server
-Player.prototype.add_powerup = function(pu) {
+Player.prototype.addPowerup = function(pu) {
   if (this.sim.type != 'server') {
     return
   }

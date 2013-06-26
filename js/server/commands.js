@@ -19,7 +19,7 @@ exports.handle_command = function(socket, sim, sender, entity_id, command, args)
     powerup: function() {
       if (player_entity) {
         _.each(arguments, function(powerup_type) {
-          player_entity.add_powerup(powerup_type)
+          player_entity.addPowerup(powerup_type)
           reply('Adding powerup ' + powerup_type)
         })
       } else {

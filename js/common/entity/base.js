@@ -31,18 +31,18 @@ Entity.prototype.updateCollide = function() {
   this.collide.update_cwh(this.position, this.radius*2, this.radius*2)
 }
 
-Entity.prototype.simulate = function(dt) {},
+Entity.prototype.simulate = function(dt) {}
 
-  Entity.prototype.rotate = function(theta) {
-    this.rotation += rangewrap(theta, 2*Math.PI)
-  }
+Entity.prototype.rotate = function(theta) {
+  this.rotation += rangewrap(theta, 2*Math.PI)
+}
 
-Entity.prototype.spawn = function() {},
+Entity.prototype.spawn = function() {}
 
-  Entity.prototype.kill = function() {
-    this.remove_me = true
-    pubsub.publish('killed', this.id)
-  }
+Entity.prototype.kill = function() {
+  this.remove_me = true
+  pubsub.publish('killed', this.id)
+}
 
 Entity.prototype.positionData = function() {
   return {

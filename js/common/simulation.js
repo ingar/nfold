@@ -130,8 +130,8 @@ Simulation.prototype._setupSimulationEvents = function(sim) {
     })
   })
 
-  pubsub.subscribe('killed', function(entity_id) {
-    sim.net.broadcast('kill', entity_id)
+  pubsub.subscribe('killed', function(id) {
+    sim.net.broadcast('kill', id)
   })
 
   var last_local_player_broadcast = 0
