@@ -11,7 +11,7 @@ function Explosion(opts) {
     lifespan: Math.random() * 0.75 + 0.25,
     expansion_rate: Math.random() * 100 + 50,
     radius: 0,
-    flags: exports.SPAWN_CLIENT,
+    flags: Entity.SPAWN_CLIENT,
     render_radius: 1
   }, opts)])
 }
@@ -32,5 +32,4 @@ Explosion.prototype.simulate = function(dt) {
   }
 }
 
-exports.Explosion = Explosion
 entity.register('Explosion', Explosion)
