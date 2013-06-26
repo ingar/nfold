@@ -18,7 +18,7 @@ function Explosion(opts) {
 Explosion.prototype = new Entity()
 
 Explosion.prototype.initCollide = function() {
-  return collide.Point(this.position, { flags: Entity.VISIBLE })
+  return collide.Point(this.position)
 }
 
 Explosion.prototype.updateCollide = function() {}

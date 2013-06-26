@@ -19,7 +19,7 @@ function Projectile(opts) {
 Projectile.prototype = new Entity()
 
 Projectile.prototype.initCollide = function() {
-  return collide.Point(this.position, { flags: Entity.PHYSICAL | Entity.VISIBLE })
+  return collide.Point(this.position)
 }
 
 Projectile.prototype.updateCollide = function() {

@@ -24,7 +24,7 @@ function Entity(options) {
 Entity.prototype.updatePhysics = physics.standard
 
 Entity.prototype.initCollide = function() {
-  return collide.AABB_cwh(this.position, this.radius*2, this.radius*2, { flags: Entity.PHYSICAL | Entity.VISIBLE })
+  return collide.AABB_cwh(this.position, this.radius*2, this.radius*2)
 }
 
 Entity.prototype.updateCollide = function() {
@@ -75,16 +75,9 @@ Entity.prototype._simulate = function(dt, sim) {
 }
 
 _.extend(Entity, {
-  MOVE_SERVER:      0x0001,
-  SIMULATE_SERVER:  0x0002,
   COLLIDE_SERVER:   0x0004,
-  MOVE_CLIENT:      0x0008,
-  SIMULATE_CLIENT:  0x0010,
-  COLLIDE_CLIENT:   0x0020,
   SPAWN_SERVER:     0x0040,
-  SPAWN_CLIENT:     0x0080,
-  VISIBLE:          0x0010,
-  PHYSICAL:         0x0020
+  SPAWN_CLIENT:     0x0080
 })
 
 exports.Entity = Entity

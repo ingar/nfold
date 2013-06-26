@@ -17,7 +17,7 @@ function Powerup(opts) {
 Powerup.prototype = new Entity()
 
 Powerup.prototype.initCollide = function() {
-  return collide.Point(this.position, { flags: Entity.VISIBLE | Entity.PHYSICAL })
+  return collide.Point(this.position)
 }
 
 Powerup.prototype.updateCollide = function() {}
